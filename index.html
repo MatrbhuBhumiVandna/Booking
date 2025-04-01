@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ticket Booking System</title>
+    <style>
+        body { font-family: Arial; max-width: 1200px; margin: 0 auto; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .booked { background-color: #ffdddd; }
+        .available { background-color: #ddffdd; }
+    </style>
+</head>
+<body>
+    <h1>Ticket Booking System</h1>
+    
+    <!-- Booking Form -->
+    <div>
+        <h2>New Booking</h2>
+        <form id="bookingForm">
+            <label>Date: <input type="date" id="bookingDate" required></label>
+            <label>Name: <input type="text" id="buyerName" required></label>
+            <label>Mobile: <input type="tel" id="mobileNo" required></label>
+            <label>Ticket Type:
+                <select id="ticketType" required>
+                    <option value="Janjir Killo (200)">Janjir Killo (200)</option>
+                    <option value="SindhuDurg Killo (500)">SindhuDurg Killo (500)</option>
+                    <option value="Pratapgadh Killo (1000)">Pratapgadh Killo (1000)</option>
+                    <option value="PanarGadh Killo (2000)">PanarGadh Killo (2000)</option>
+                    <option value="Toran Killo (3000)">Toran Killo (3000)</option>
+                    <option value="ShivNeri Killo (5000)">ShivNeri Killo (5000)</option>
+                </select>
+            </label>
+            <label>Ticket Numbers (comma-separated): 
+                <input type="text" id="ticketNumbers" required placeholder="1,2,3">
+            </label>
+            <button type="submit">Book Tickets</button>
+        </form>
+    </div>
+
+    <!-- Summary Report -->
+    <div>
+        <h2>Summary Report</h2>
+        <table id="summaryTable">
+            <thead>
+                <tr>
+                    <th>Ticket Type</th>
+                    <th>Booked</th>
+                    <th>Available</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filled by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Inventory Display -->
+    <div>
+        <h2>Inventory Status</h2>
+        <select id="inventoryType">
+            <option value="Janjir Killo (200)">Janjir Killo</option>
+            <!-- Other options -->
+        </select>
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Ticket No.</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filled by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Data Storage
+        let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+        const TICKET_LIMIT = 1000;
+
+        // Form Submission
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newBooking = {
+                date: document.getElementById('bookingDate').value,
+                name: document.getElementById('buyerName').value,
+                mobile: document.getElementById('mobileNo').value,
+                type: document.getElementById('ticketType').value,
+                tickets: document.getElementById('ticketNumbers').value.split(',').map(t => t.trim()),
+                quantity: document.getElementById('ticketNumbers').value.split(',').length
+            };
+            
+            bookings.push(newBooking);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            updateUI();
+            this.reset();
+        });
+
+        // Update All Displays
+        function updateUI() {
+            updateSummary();
+            updateInventory();
+        }
+
+        // Summary Report
+        function updateSummary() {
+            const types = [
+                "Janjir Killo (200)", "SindhuDurg Killo (500)", 
+                "Pratapgadh Killo (1000)", "PanarGadh Killo (2000)",
+                "Toran Killo (3000)", "ShivNeri Killo (5000)"
+            ];
+            
+            let html = '';
+            types.forEach(type => {
+                const booked = bookings.reduce((total, b) => 
+                    b.type === type ? total + b.quantity : total, 0);
+                
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${booked}</td>
+                        <td>${TICKET_LIMIT - booked}</td>
+                        <td>${TICKET_LIMIT}</td>
+                    </tr>
+                `;
+            });
+            
+            document.querySelector('#summaryTable tbody').innerHTML = html;
+        }
+
+        // Inventory Display
+        function updateInventory() {
+            // Implement similar to summary
+        }
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>
